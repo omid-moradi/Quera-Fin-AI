@@ -10,6 +10,7 @@ The competition presents two challenges based on real-world datasets:
 
 1. **Online Store Discounts** (Question 1)
 2. **Electricity Consumption Forecasting** (Question 2)
+3. **Diabetes Prediction** (Question 3)
 
 Each part includes a dataset, a notebook with data exploration and modeling, and final predictions suitable for submission to the competition platform.
 
@@ -75,6 +76,64 @@ Each part includes a dataset, a notebook with data exploration and modeling, and
 ✅ **Selected Model**: XGBoost with tuned hyperparameters  
 📌 **Final R² Score**: **0.998**  
 📌 **Test Predictions Format**:
+
+## 🆎 Question 3: Diabetes Prediction
+
+### 📂 Files:
+- `diabet.ipynb`: Complete modeling notebook for diabetes classification.
+- `diabetes.csv`: Patient-level medical dataset with diagnosis labels.
+- `submission.csv`: Final test predictions formatted for competition submission.
+
+### 🎯 Objectives:
+- Predict whether a person has:
+  - **Type 1 Diabetes** → label `1`
+  - **Type 2 Diabetes** → label `2`
+- Maximize **F1-Score (Macro)** as the main evaluation metric  
+- F1-Score is rounded to **three decimal digits ×100** for competition grading
+
+---
+
+### ⚙️ Methodology:
+
+#### 🔹 Data Cleaning & Preprocessing:
+- **Dropped Redundant Columns**: e.g., `Health_region_grouped`, `Total_physical_act_time`
+- **Handled Dirty/Missing Values**:
+  - Replaced abnormal placeholders like `9996`, `9999.6`, `96`, `99` with `NaN`
+  - Imputed missing values using **normal distribution sampling** (mean ± std, clipped)
+- **Class Label Adjustment**:  
+  - For compatibility with some models (like XGBoost), mapped labels from `{1, 2}` → `{0, 1}`
+
+#### 🔹 Feature Engineering:
+- Correlation analysis to identify most predictive features
+- Removed low-correlation or redundant features
+- Detected and clipped extreme values
+
+---
+
+### 🧪 Modeling Strategy:
+
+#### Baseline:
+- **Logistic Regression**:
+  - With and without class weighting
+  - Best tuned F1 Macro Score: **0.7387**
+
+#### Advanced Modeling & Grid Search:
+Tested using **StratifiedKFold (5-fold)** CV and `f1_macro` scoring:
+
+| Model          | F1 Macro (Validation) | Best Parameters |
+|----------------|------------------------|------------------|
+| RandomForest   | **0.7403** ✅           | `max_depth=20`, `n_estimators=300`, `class_weight=balanced` |
+| CatBoost       | 0.7382                 | `depth=6`, `iterations=100`, `learning_rate=0.1`, `scale_pos_weight=1` |
+| XGBoost        | 0.7374                 | `max_depth=3`, `n_estimators=100`, `learning_rate=0.1`, `scale_pos_weight=1` |
+
+---
+
+### ✅ Final Model:
+
+- **Selected Model**: `RandomForestClassifier` with tuned hyperparameters  
+- **Final Macro F1-Score**: **0.7403** → **Score: 74.0** for competition  
+
+---
 
 
 # 👽 Notes
